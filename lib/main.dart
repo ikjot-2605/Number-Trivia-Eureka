@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(MyApp());
@@ -13,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Number Trivia'),
     );
   }
 }
@@ -28,11 +29,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  final TextEditingController _controller = new TextEditingController();
+  Widget responseReceived;
+  void initState() {
+    responseReceived = Container(
+      child: Text('The result will be displayed here!'),
+    );
+  }
 
-  void _incrementCounter() {
+  Future<String> _getTrivia(String number) async {
+    String result;
+    final response = await http.get('http://numbersapi.com/${number}');
+    return response.body;
+  }
+
+  _buttonClicked(String number) {
     setState(() {
-      _counter++;
+      responseReceived = FutureBuilder(
+          future: _getTrivia(number),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasData) {
+              return Text(snapshot.data);
+            } else {
+              return Text('There was an error');
+            }
+          });
     });
   }
 
@@ -40,27 +63,30 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text('Flutter Demo'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          TextField(
+            controller: _controller,
+          ),
+          FlatButton(
+            child: Text('Get Trivia'),
+            onPressed: () {
+              print('Button Pressed');
+              if (_controller.text.length > 0) {
+                _buttonClicked(_controller.text);
+              } else {
+                setState(() {
+                  responseReceived =
+                      Text('Please enter some number in the text field.');
+                });
+              }
+            },
+          ),
+          responseReceived,
+        ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
