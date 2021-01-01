@@ -42,8 +42,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> _getTrivia(String number) async {
     String result;
-    final response = await http.get('http://numbersapi.com/${number}');
-    return response.body;
+    //final response = await http.get('http://numbersapi.com/${number}');
+    //return response.body;
+    await Future.delayed(Duration(seconds: 1));
+    return '$number is a good number.';
   }
 
   _buttonClicked(String number) {
