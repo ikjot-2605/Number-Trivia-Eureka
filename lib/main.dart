@@ -33,7 +33,10 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget responseReceived;
   void initState() {
     responseReceived = Container(
-      child: Text('The result will be displayed here!'),
+      child: Text(
+        'The result will be displayed here!',
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -51,9 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
             } else if (snapshot.hasData) {
-              return Text(snapshot.data);
+              return Text(
+                snapshot.data,
+                textAlign: TextAlign.center,
+              );
             } else {
-              return Text('There was an error');
+              return Text(
+                'There was an error',
+                textAlign: TextAlign.center,
+              );
             }
           });
     });
@@ -64,27 +73,38 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Flutter Demo'),
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _controller,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              keyboardType: TextInputType.number,
+              controller: _controller,
+            ),
           ),
-          FlatButton(
-            child: Text('Get Trivia'),
-            onPressed: () {
-              print('Button Pressed');
-              if (_controller.text.length > 0) {
-                _buttonClicked(_controller.text);
-              } else {
-                setState(() {
-                  responseReceived =
-                      Text('Please enter some number in the text field.');
-                });
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: FlatButton(
+              child: Text('Get Trivia'),
+              onPressed: () {
+                print('Button Pressed');
+                if (_controller.text.length > 0) {
+                  _buttonClicked(_controller.text);
+                } else {
+                  setState(() {
+                    responseReceived =
+                        Text('Please enter some number in the text field.');
+                  });
+                }
+              },
+            ),
           ),
-          responseReceived,
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: responseReceived,
+          ),
         ],
       ),
     );
